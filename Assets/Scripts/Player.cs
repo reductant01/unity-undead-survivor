@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Goldmetal.UndeadSurvivor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,6 +8,7 @@ public class Player : MonoBehaviour
 {
     public Vector2 inputVec;
     public float speed; 
+    public Scanner scanner; // 플레이어 스크립트에서 Scanner클래스 타입 변수 선언 및 초기화
 
     Rigidbody2D rigid;
     SpriteRenderer spriter; // SpriteRenderer 값을 받아올 변수
@@ -17,6 +19,7 @@ public class Player : MonoBehaviour
         rigid = GetComponent<Rigidbody2D>(); // GetComponent<컴포넌트 이름> = 오브젝트에서 컴포넌트를 가져오는 함수
         spriter = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+        scanner = GetComponent<Scanner>();
 
     }
     

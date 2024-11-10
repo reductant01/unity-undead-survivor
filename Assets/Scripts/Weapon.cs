@@ -8,6 +8,14 @@ public class Weapon : MonoBehaviour
     public int count;
     public float speed;
 
+    float timer; // 총알 발사 간격
+    Player player; // Scanner 스크립트에 접근하기위해 부모 오브젝트에 접근
+
+    void Awake()
+    {
+        player = GetComponentInParent<Player>(); // GetCommponentInParent 함수로 부모의 컴포넌트 가져오기
+    }
+
     void Start()
     {
         Init();
@@ -22,12 +30,18 @@ public class Weapon : MonoBehaviour
                 // Rotate를 하고 기준점을 Vector3.back으로 했으므로 위치를 (0,0,0)으로 두면 단지 제자리에서 돌 뿐이다, 그러므로 수정필요
                 break;
             default:
+                timer += Time.deltaTime; 
+
+                if (timer > speed) { // speed보다 커지면 초기화하면서 발사로직 실행
+                    timer = 0f;
+                    Fire();
+                }
                 break;    
         }
 
         // .. Test Code .. 
         if (Input.GetButtonDown("Jump")) {
-            LevelUp(20, 5);
+            LevelUp(10, 1);
         }
     }
 
@@ -46,10 +60,10 @@ public class Weapon : MonoBehaviour
         switch (id) { // 무기 ID에 따라 로직을 분리할 Switch문 작성
             case 0:
                 speed = 150; // 시계방향의 속도 -150, speed에 양수를 사용하기위해 Update에서 Vector3.forward가 아닌 Vector3.back를 곱해줌
-
                 Batch();
                 break;
             default:
+                speed = 0.3f; // speed값은 연사속도를 의미 = 적을 수록 많이 발사
                 break;    
         }
     }
@@ -80,8 +94,24 @@ public class Weapon : MonoBehaviour
             // 회전 이휴의 자신의 위쪽방향으로 이동하는 것이 포인트
             // Space.World대신 Space.Self를 쓰게되면 회전방향에 따라 이동방향이 바뀌게 된다
             
-            bullet.GetComponent<Bullet>().Init(damage, -1); // -1 is Infinity Per, per은 관통 계수이지만 근접무기의 경우 의미가 없으므로 -1로 지정
+            bullet.GetComponent<Bullet>().Init(damage, -1, Vector3.zero); // -1 is Infinity Per, per은 관통 계수이지만 근접무기의 경우 의미가 없으므로 -1로 지정, 속도도 0으로 지정
             // Bullet 컴포넌트 접근하여 미리 만들어놓은 Init 속성 초기화 함수 호출
         }
+    }
+
+    void Fire() 
+    {
+        if (!player.scanner.nearestTarget)  // Scannr안의 nearestTarget변수에 접근하기 위해 Player스크립트에 Scanner추가
+            return;
+        
+        Vector3 targetPos = player.scanner.nearestTarget.position;
+        Vector3 dir = targetPos - transform.position; // 크기가 포함된 방향 = 목표 위치 - 나의 위치 
+        dir = dir.normalized; // normalized = 현재 벡터의 방향은 우지하고 크기를 1로 변환한 속성, dir은 크기를 가지고 있는 방향이기에 normalized필요
+
+        Transform bullet = GameManager.instance.pool.Get(prefabId).transform; // 오브젝트 풀링에서 총알 생성
+        bullet.position = transform.position; // 기존 생성로직을 그대로 활용하면서 위치는 플레이어 위치로 지정
+        bullet.rotation = Quaternion.FromToRotation(Vector3.up, dir); // FromToRatation = 지정된 축을 중심으로 목표를 향해 회전하는 함수
+        bullet.GetComponent<Bullet>().Init(damage, count, dir); // 원거리 공격에 맞게 초기화 함수 호출하기, 원거리 공격에서는 Count가 관통변수이고 dir이 속도이다
+
     }
 }
