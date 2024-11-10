@@ -4,16 +4,21 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     public float speed;
+    public float health;
+    public float maxHealth;
+    public RuntimeAnimatorController[] animCon; // 몬스터의 애니매이션을 받을 변수
     public Rigidbody2D target;
 
-    bool isLive = true; // 살아있는지를 확인
+    bool isLive; // 살아있는지를 확인
 
     Rigidbody2D rigid; // 위치이동을 위해 rigid 변수 생성
+    Animator anim; // 받은 애니매이션들을 저장할 변수
     SpriteRenderer spriter; // 방향 반전을 위해 SpriteRenderer 변수 생성
     
     void Awake() 
     {
         rigid = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
         spriter = GetComponent<SpriteRenderer>();
     }
 
@@ -45,5 +50,15 @@ public class Enemy : MonoBehaviour
     void OnEnable() // OnEnable = 스크립트가 활성화 될때 호출되는 이벤트 함수, 
     {
         target = GameManager.instance.player.GetComponent<Rigidbody2D>(); // OnEnable에서 타겟변수에 게임매니저를 활용하여 플레이어 할당, target은 RigidBody2D이므로 GetComponent가 필요하다
+        isLive = true; // 처음 생성될때는 살아있도록 설정
+        health = maxHealth; // 처음 생성될때는 최대체력으로 생성되도록 해야한다   
+    }
+
+    public void Init(SpawnData data) // 레벨링에 따른 몬스터 상태 변경
+    {
+        anim.runtimeAnimatorController = animCon[data.spriteType]; // 매개변수의 속성을 몬스터 속성변경에 활용하기
+        speed = data.speed;
+        maxHealth = data.health;
+        health = data.health;
     }
 }

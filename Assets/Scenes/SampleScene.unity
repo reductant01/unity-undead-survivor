@@ -9608,6 +9608,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3061c4c7d001be8499b56eec66b99595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameTime: 0
+  maxGametime: 20
   player: {fileID: 49795752}
   pool: {fileID: 933895482}
 --- !u!4 &917496386
@@ -9651,7 +9653,7 @@ Transform:
   m_GameObject: {fileID: 933895480}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.40309447, y: -0.7400205, z: 0.030574875}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9670,7 +9672,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabs:
-  - {fileID: 6015797595242068585, guid: 162120975ab28004c979f5f1251927a6, type: 3}
   - {fileID: 1853132439011333935, guid: ae5e4e9474435d2459cf92da69c90ff4, type: 3}
 --- !u!1 &934940476
 GameObject:
@@ -9838,6 +9839,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnPoint: []
+  spawnData:
+  - spawnTime: 0.7
+    spriteType: 0
+    health: 10
+    speed: 1.5
+  - spawnTime: 0.2
+    spriteType: 1
+    health: 15
+    speed: 2.5
 --- !u!1 &1228295948
 GameObject:
   m_ObjectHideFlags: 0
