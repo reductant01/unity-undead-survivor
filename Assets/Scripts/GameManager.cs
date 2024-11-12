@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
     public float maxGametime = 2 * 10f; // 최대게임시간
     
     [Header("# Player Info")]
+    public int health;
+    public int maxHealth = 100;
     public int level;
     public int kill;
     public int exp;
@@ -23,6 +25,11 @@ public class GameManager : MonoBehaviour
     void Awake() 
     {
         instance = this;
+    }
+
+    void Start()
+    {
+        health = maxHealth; // 시작할 때 현재 체력과 최대 체력이 같도록 로직 추가
     }
 
     void Update()
