@@ -1,8 +1,7 @@
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Item", menuName = "Scriptble Object/ItemData")] // CreateAssetMenu = 커스텀 메뉴를 생성하는 속성
-public class ItemData : ScriptableObject
+public class ItemData : ScriptableObject // 스크립트블 오브젝트 = 다양한 데이터를 저장하는 에셋
 {
     public enum ItemType { Melee, Range, Glove, Shoe, Heal } // 근접공격, 원거리공격, 장갑, 신발, 체력회복
     
@@ -10,12 +9,12 @@ public class ItemData : ScriptableObject
     public ItemType itemType;
     public int itemId; 
     public string itemName;
-    public string itemDec; 
+    public string itemDesc; 
     public Sprite itemIcon; // 아이템 아이콘
 
     [Header("# Level Data")]
     public float baseDamage; // 0레벨 일때의 기본 공격력
-    public float baseCount; // 0레벨 일때의 기본 카운트(관통, 근접공격속도)
+    public float baseCount; // 0레벨 일때의 기본 카운트(관통, 근접무기갯수)
     public float[] damage;
     public int[] counts;
 
