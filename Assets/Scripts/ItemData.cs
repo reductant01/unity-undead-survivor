@@ -9,15 +9,17 @@ public class ItemData : ScriptableObject // 스크립트블 오브젝트 = 다�
     public ItemType itemType;
     public int itemId; 
     public string itemName;
+    [TextArea] // 인스팩터에 텍스트를 여러줄 넣을수있게 TextArea 속성 부터
     public string itemDesc; 
     public Sprite itemIcon; // 아이템 아이콘
 
     [Header("# Level Data")]
     public float baseDamage; // 0레벨 일때의 기본 공격력
-    public float baseCount; // 0레벨 일때의 기본 카운트(관통, 근접무기갯수)
-    public float[] damage;
+    public int baseCount; // 0레벨 일때의 기본 카운트(관통, 근접무기갯수)
+    public float[] damages;
     public int[] counts;
 
     [Header("# Weapon")]
     public GameObject projectile; // 투사체
+    public Sprite hand; // 스크립트블 오브젝트 코드에서 손 스프라이트를 담을 속성 추가
 }

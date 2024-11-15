@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
     public Vector2 inputVec;
     public float speed; 
     public Scanner scanner; // 플레이어 스크립트에서 Scanner클래스 타입 변수 선언 및 초기화
+    public Hand[] hands; // 플레이어에서 손 스크립트를 담을 배열변수
 
     Rigidbody2D rigid;
     SpriteRenderer spriter; // SpriteRenderer 값을 받아올 변수
@@ -17,7 +18,7 @@ public class Player : MonoBehaviour
         spriter = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
         scanner = GetComponent<Scanner>();
-
+        hands = GetComponentsInChildren<Hand>(true); // 비활성화된 오브젝트는 GetComponent에서 제외된다, 인자값 true를 넣으면 비활성화된 오브젝트도 GetComponent로 가져올 수 있다
     }
     
     void Update()

@@ -13,13 +13,14 @@ public class Weapon : MonoBehaviour
 
     void Awake()
     {
-        player = GetComponentInParent<Player>(); // GetCommponentInParent 함수로 부모의 컴포넌트 가져오기
+        // player = GetComponentInParent<Player>(); // GetCommponentInParent 함수로 부모의 컴포넌트 가져오기
+        player = GameManager.instance.player; // 처음부터 플레이어의 자식으로 있는것이 아니라 Init함수에 의해 플레이어의 자식으로 생성되므로 플레이어의 초기화는 게임매니저 활용으로 변경
     }
 
-    void Start()
-    {
-        Init();
-    }
+    // void Start() // Start로직에서의 Init은 이제 Item.Onclick에서 실행될것이므로 삭제
+    // {
+    //     Init();
+    // }
 
     void Update()
     {
@@ -47,16 +48,41 @@ public class Weapon : MonoBehaviour
 
     public void LevelUp(float damage, int count) // 레벨업 기능 함수
     {
-        this.damage = damage;
+        this.damage += damage;
         this.count += count;
 
         if (id == 0) { 
             Batch(); // 속성 변경과 동시에 근접무기의 경우 배치도 필요하니 함수 호출
         }
+
+        player.BroadcastMessage("ApplyGear", SendMessageOptions.DontRequireReceiver); 
+        // 레벨업을 하고 Gear를 호출하는 경우에도 달라진 값이 적용될수있도록 마지막 부분에서 호출
+        // Gear.cs에서 Weapon의 damage를 받아오는 것이 아니라 직접 입력한 값으로 작용하기 떄문에 생기는 문제
+        // BroadcastMessage의 두번째 인자값으로 DontrequireReceiver 추가
     }
 
-    public void Init() // 변수들을 초기화
+    public void Init(ItemData data) // 변수들을 초기화, 스크립트블 오브젝트를 매개변수로 받아 활용
     {
+        // Basic Set
+        name = "Weapon" + data.itemId; // 새로 생성될 파일의 이름 설정
+        transform.parent = player.transform; // 부모오브젝트를 player로 고정
+        // 처음 생성할때 플레이어의 자식오브젝트로 생성되야한다
+        transform.localPosition = Vector3.zero; // 지역 위치인 localPosition을 원점으로 변경
+
+        // Property Set
+        id = data.itemId; // 각종 무기 속성변수들을 스크립트블 오브젝트 데이터로 초기화 
+        damage = data.baseDamage;
+        count = data.baseCount; 
+
+        // ItemData 에서 prefabId를 숫자로 입력받아도 되지만 그렇게하면 PoolManager에서 prefab의 순서와 prefabId를 일치하여 입력해줘야한다는 번거러움이 있다
+        // 그렇기에 스크립트블 오브젝트의 독립성을 위해서 인덱스가 아닌 프리펩으로 설정한다
+        for (int index=0; index < GameManager.instance.pool.prefabs.Length; index++) {
+            if (data.projectile == GameManager.instance.pool.prefabs[index]) { // 프리펩 아이디는 풀링 매니저의 변수에서 찾아서 초기화
+                prefabId = index;
+                break;
+            }
+        }
+
         switch (id) { // 무기 ID에 따라 로직을 분리할 Switch문 작성
             case 0:
                 speed = 150; // 시계방향의 속도 -150, speed에 양수를 사용하기위해 Update에서 Vector3.forward가 아닌 Vector3.back를 곱해줌
@@ -66,6 +92,14 @@ public class Weapon : MonoBehaviour
                 speed = 0.3f; // speed값은 연사속도를 의미 = 적을 수록 많이 발사
                 break;    
         }
+
+        // Hand Set
+        Hand hand = player.hands[(int)data.itemType]; // enum 열거형 데이터는 정수 형태로도 사용가능, enum 값앞에 int 타입을 작성하여 강제 형 변환
+        hand.spriter.sprite = data.hand; // ItemData.hand에 이미 넣어놓은 sprite를 
+        hand.gameObject.SetActive(true); // 비활성화되어있는 hand.gameObject를 SetActive 함수로 활성화
+
+        player.BroadcastMessage("ApplyGear"); // BroadcastMessage = 특정함수 호출을 모든 자식에서 방송하는 함수
+        // BroadcastMessage의 두번째 인자값으로 DontrequireReceiver 추가
     }
 
     // 생성된 무기를 배치하는 함수 생성, 호출 필요
