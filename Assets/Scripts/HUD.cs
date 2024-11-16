@@ -22,7 +22,7 @@ public class Hud : MonoBehaviour
         switch (type) { // LateUpdate에서 switch ~ case 문으로 로직나누기
             case InfoType.Exp:
                 float curExp = GameManager.instance.exp; // 슬라이더에 적용할 값 = 현재 경험치 / 최대 경험치
-                float maxExp = GameManager.instance.nextExp[GameManager.instance.level];
+                float maxExp = GameManager.instance.nextExp[Mathf.Min(GameManager.instance.level, GameManager.instance.nextExp.Length-1)];
                 mySlider.value = curExp / maxExp;
                 break;
             case InfoType.Level:

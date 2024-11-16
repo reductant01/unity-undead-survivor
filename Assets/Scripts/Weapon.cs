@@ -24,6 +24,10 @@ public class Weapon : MonoBehaviour
 
     void Update()
     {
+        if (!GameManager.instance.isLive) {
+            return; // isLive가 false이면(시간이 멈추면) 동작하지 못하도록 조건 추가
+        }
+
         // Update로직도 switch 문 활용하여 무기마다 로직 실행
         switch (id) {
             case 0:
@@ -98,7 +102,7 @@ public class Weapon : MonoBehaviour
         hand.spriter.sprite = data.hand; // ItemData.hand에 이미 넣어놓은 sprite를 
         hand.gameObject.SetActive(true); // 비활성화되어있는 hand.gameObject를 SetActive 함수로 활성화
 
-        player.BroadcastMessage("ApplyGear"); // BroadcastMessage = 특정함수 호출을 모든 자식에서 방송하는 함수
+        player.BroadcastMessage("ApplyGear", SendMessageOptions.DontRequireReceiver); // BroadcastMessage = 특정함수 호출을 모든 자식에서 방송하는 함수
         // BroadcastMessage의 두번째 인자값으로 DontrequireReceiver 추가
     }
 

@@ -29,7 +29,13 @@ public class Enemy : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!isLive) // 살아있지 않다면 아래의 코드를 실행하지 않는다
+        if (!GameManager.instance.isLive) {
+            return; // isLive가 false이면(시간이 멈추면) 동작하지 못하도록 조건 추가
+        }
+        
+        // GetCurrentAnimatorStateInfo(애니메이션의 레이어 인덱스 성분) = 현재 상태정보를 가져오는 함수
+        // IsName = 해당 상태의 이름이 지정된 것과 같은지 확인하는 함수
+        if (!isLive || anim.GetCurrentAnimatorStateInfo(0).IsName("Hit"))
             return;
 
         Vector2 dirVec = target.position - rigid.position; 
@@ -42,10 +48,11 @@ public class Enemy : MonoBehaviour
 
     void LateUpdate()
     {
-        // GetCurrentAnimatorStateInfo(애니메이션의 레이어 인덱스 성분) = 현재 상태정보를 가져오는 함수
-        // IsName = 해당 상태의 이름이 지정된 것과 같은지 확인하는 함수
-        if (!isLive || anim.GetCurrentAnimatorStateInfo(0).IsName("Hit"))
-
+        if (!GameManager.instance.isLive) {
+            return; // isLive가 false이면(시간이 멈추면) 동작하지 못하도록 조건 추가
+        }
+        
+        if (!isLive) // 살아있지 않다면 아래의 코드를 실행하지 않는다
             return;
 
         spriter.flipX = target.position.x < rigid.position.x; 
