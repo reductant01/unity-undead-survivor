@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement; // 장면관리를 사용하기 위해 SceneManagement 네임스페이스 추가
 
 public class GameManager : MonoBehaviour
 {
@@ -23,6 +25,8 @@ public class GameManager : MonoBehaviour
     public Player player;
     public PoolManager pool; // 다양한 곳에서 쉽게 접근할 수 있도록 게임매니저에 풀 매니저 추가
     public LevelUp UILevelUp;
+    public Result UIResult; // 게임결과 UI오브젝트를 저장할 변수 
+    public GameObject enemyCleaner; // 게임 승리할때 적을 정리하는 클리너 변수 
 
     void Awake() 
     {
@@ -36,6 +40,46 @@ public class GameManager : MonoBehaviour
         // 임시 스크립트 (첫번째 캐릭터 선택)
         UILevelUp.Select(0); // 게임이 처음 시작하면 기본 근접무기 하나를 지급
         isLive = true;
+        Resume(); // 게임 시작 함수 내에 시간 재개 함수 호출 
+    }
+
+    public void GameOver() // 게임오버 담당 함수
+    {
+        StartCoroutine(GameOverRoutine());
+    }
+
+    IEnumerator GameOverRoutine() // 바로 Stop()이 실행되면 플레이어의 Dead애니메이션이 실행되기전 시간이 멈출수있기에 게임오버 코루틴 작성
+    {
+        isLive = false;
+
+        yield return new WaitForSeconds(0.5f); // 0.5초의 딜레이를 준다
+
+        UIResult.gameObject.SetActive(true); // 게임결과 UI오브젝트 활성화
+        UIResult.Lose();
+        Stop(); // 시간을 멈춤
+    }
+
+    public void GameVictory() // 게임승리 담당 함수
+    {
+        StartCoroutine(GameVictoryRoutine());
+    }
+
+    IEnumerator GameVictoryRoutine() // 바로 Stop()이 실행되면 몬스터의 Dead 애니메이션이 실행되기전 시간이 멈출수있기에 코루틴 작성
+    {
+        isLive = false;
+        enemyCleaner.SetActive(true); // 게임 승리 코루틴의 전반부에 적 클리너를 활성화
+
+        yield return new WaitForSeconds(0.5f); // 0.5초의 딜레이를 준다
+
+        UIResult.gameObject.SetActive(true); // 게임결과 UI오브젝트 활성화
+        UIResult.Win();
+        Stop(); // 시간을 멈춤
+    }
+
+    public void GameRetry() // 게임재시작 함수
+    {
+        SceneManager.LoadScene(0); 
+        // LoadScene = 이름 혹은 인덱스로 장면을 새롭게 부르는 함수, ()안에 Scene의 이름이나 순서를 배치, 현재의 SampleScene은 0번으로 되어있다    
     }
 
     void Update()
@@ -48,11 +92,17 @@ public class GameManager : MonoBehaviour
 
         if (gameTime > maxGametime) {
             gameTime = maxGametime;
+            GameVictory(); // 게임 시간이 최대시간을 넘기는 때에 게임 승리 함수 호출
         }
     }
 
     public void GetExp()
     {
+        if (!isLive) { // 게임종료시 몬스터가 죽으면서 경험치를 얻게되면 레벨업 창이 뜰수있다
+            return;
+        }
+        
+
         exp++;
 
         // if 조건으로 필요 경험치에 도달하면 레벨 업 하도록 작성
